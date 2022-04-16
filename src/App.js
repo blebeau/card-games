@@ -1,6 +1,5 @@
-import logo from './logo.svg';
-import React, { useEffect } from 'react';
-import Hand from './components/hand';
+import React from 'react';
+import Player from './components/player';
 import './App.css';
 
 
@@ -8,7 +7,7 @@ import './App.css';
 function App() {
   return (
     <div className="App">
-      <Hand />
+      <Player />
     </div>
   );
 }

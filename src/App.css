@@ -40,3 +40,45 @@
 .card {
   height: 100px;
 }
+
+body {
+  background-image: url("../src/utils/PNG-cards-1.3/blackjackBackground.jpg");
+  background-Size: cover;
+  background-repeat: no-repeat;
+  background-color: #205337;
+}
+
+.chat {
+  bottom: 0;
+  position: absolute;
+}
+
+.player {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  margin-left: 5%;
+}
+
+.dealer {
+  position: absolute;
+  width: 100%;
+  margin-left: 5%;
+}
+
+.chatBox {
+  height: 25vh;
+  border: 1px solid white;
+  overflow-y: scroll;
+  width: 40%;
+  background-color: #205337;
+}
+
+.posts {
+  width: 25%;
+  line-break: auto;
+}
+
+.messageButtons {
+  float: left;
+}

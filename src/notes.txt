@@ -1,0 +1,10 @@
+Todo
+
+1. Card not showing when the player busts until after alert.
+2. Aces are not counting correctly
+3. Styles, or lack there of, need improved
+4. socket communication not working for the game, only for that chat
+5. Getting a new hand is not intuitive/ clean/ good
+6. Back of card should show for facedown dealer card
+7. Add chips for betting, wagering
+8. Test files

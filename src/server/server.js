@@ -20,8 +20,6 @@ io.on('connection', socket => {
     });
 
     socket.on('createTable', (data) => {
-        console.log('createTable', data);
-
         io.to(data.table).emit(data);
 
     });
@@ -32,7 +30,6 @@ io.on('connection', socket => {
 
     // Users joins the table created
     socket.on('joinTable', (data) => {
-        console.log('data', data)
         socket.join(data);
     });
 

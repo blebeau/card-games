@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 const Chat = ({ socket, table }) => {
-    console.log('socket, table', socket, table)
     const [message, setMessage] = useState('');
     const [fullChat, setfullChat] = useState([]);
 
@@ -19,15 +18,14 @@ const Chat = ({ socket, table }) => {
 
     useEffect(() => {
         socket.on('getMessages', (data) => {
-            console.log('data', data);
             setfullChat((messages) => [...messages, data]);
         })
     }, [socket])
 
     return (
         <div>
+            <h3 className="chatHeader">Chat Box</h3>
             <div className="chatBox">{fullChat.map((mes) => {
-                console.log('mes', mes)
                 return (<div className="posts">
                     <p className="message">{mes.message}</p>
                     <p className="time">{mes.time}</p>

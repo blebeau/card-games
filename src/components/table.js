@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Chat from './chat';
+import { Modal } from 'react-bootstrap'
 
 // Shuffle algorithim (Fisher-Yates, or Knuth, shuffle)
 function shuffle(array) {
@@ -30,8 +31,9 @@ const getTotal = (cards) => {
     cards.sort(function (a, b) {
         return a.length - b.length;
     });
+    const aces = cards.filter(c => c.includes('ace'));
 
-    cards.forEach(async (card) => {
+    cards.filter(c => !c.includes('ace')).forEach(async (card) => {
         if (card.includes('10') || card.includes('j') || card.includes('q') || card.includes('k')) {
             total += 10;
         } else if (card.includes('2')) {
@@ -50,16 +52,22 @@ const getTotal = (cards) => {
             total += 8;
         } else if (card.includes('9')) {
             total += 9;
-        } else if (card.includes('a')) {
-            total += 11 > 21 ? total += 1 : total += 11;
         }
+
+
     });
+
+    aces.forEach(() => {
+        total += 1;
+        if (total < 12)
+            total += 10;
+    });
+
     console.log('total', total)
     return total;
 }
 
 const Table = ({ socket, table }) => {
-    console.log('socket ion table', socket);
     const cards = [
         '2h', '2c', '2s', '2d',
         '3h', '3c', '3s', '3d',
@@ -84,16 +92,14 @@ const Table = ({ socket, table }) => {
     const [playerStay, setPlayerStay] = useState(false);
     const [winner, setWinner] = useState('');
     const [deal, setDeal] = useState(false);
+    const [showWinnerModal, setShowWinnerModal] = useState(false);
 
     // Runs once to initiate the game
     useEffect(() => {
         socket.emit('joinedgame', () => {
-            console.log('table call - joined game');
         });
         // Randomize the deck
         const shuffledDeck = shuffle(cards);
-
-        console.log('test', shuffledDeck[0])
 
         // Set hands, dealing to player first
         setHands(shuffledDeck.splice(0, 2))
@@ -118,7 +124,6 @@ const Table = ({ socket, table }) => {
     }, [])
 
     useEffect(() => {
-        console.log('deal')
         if (deal) {
             setHands(deck.splice(0, 2));
             setDealerHand(deck.splice(0, 2));
@@ -132,7 +137,6 @@ const Table = ({ socket, table }) => {
     // Updates whenever a card is added to either hand
     // and calcualtes/ compares the scores
     useEffect(() => {
-        console.log('dealer hand log');
         setdealerScore(0);
         setPlayerScore(0);
 
@@ -143,31 +147,33 @@ const Table = ({ socket, table }) => {
         setPlayerScore(playerTotal)
 
         //TODO: Add score udates for socket
-
-        if (playerTotal > 21) {
-            alert('Busted!');
-            setWinner('Dealer');
-        }
-        if (dealerTotal > 21) {
-            alert('Busted!');
-            setWinner('Player');
-        }
-        if (dealerTotal < playerTotal && dealerTotal > 16) {
-            setWinner('Player')
-        }
-        if (dealerTotal >= playerTotal && dealerTotal > 16) {
-            setWinner('Dealer')
-        }
     }, [dealerHand, hands])
 
+
+    // useEffect(() => {
+    //     if (dealerScore > 21) {
+    //         alert('Busted!');
+    //         setWinner('Dealer');
+    //     }
+    //     if (dealerScore > 21) {
+    //         alert('Busted!');
+    //         setWinner('Player');
+    //     }
+    //     if (dealerScore < playerScore && dealerScore > 16) {
+    //         setWinner('Player')
+    //         alert(`Winner: ${winner}`)
+    //     }
+    //     if (dealerScore >= playerScore && dealerScore > 16) {
+    //         setWinner('Dealer')
+    //         alert(`Winner: ${winner}`)
+    //     }
+    // }, [playerScore, dealerScore])
 
     const hit = () => {
         if (!playerStay)
             setHands([...hands, deck[0]]);
         else
             setDealerHand([...dealerHand, deck[0]]);
-        console.log('dealerHand', dealerHand);
-        console.log('hands', hands);
         // removes added card from the deck
         setDeck(deck.filter(x => x !== deck[0]))
 
@@ -176,6 +182,8 @@ const Table = ({ socket, table }) => {
             dealerHand: [...dealerHand],
             deck: deck.filter(x => x !== deck[0]),
         });
+        console.log('playerScore', playerScore);
+        console.log('dealerScore', dealerScore);
     }
 
     const stay = () => {
@@ -190,6 +198,8 @@ const Table = ({ socket, table }) => {
         setPlayerScore(playerTotal)
 
         //TODO: Add score udates for socket
+
+        setShowWinnerModal(true)
 
         if (playerTotal > 21) {
             alert('Busted!');
@@ -213,7 +223,7 @@ const Table = ({ socket, table }) => {
     return (
         <div>
             <div className='dealer'>
-                <div >Dealer</div>
+                <h3>Dealer</h3>
                 {
                     // To get the dealers second card to show face down first
                     // !playerStay ?
@@ -248,7 +258,7 @@ const Table = ({ socket, table }) => {
 
             </div>
             <div className='player'>
-                <div>Player</div>
+                <h3>Player</h3>
                 {
                     hands.map(
                         (image) =>

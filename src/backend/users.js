@@ -19,7 +19,6 @@ const getUser = (id) => {
 }
 
 const getUsersAtTable = (table) => {
-    console.log('get users at table', table)
     users.filter(user => user.table === table);
     return users.length || 0;
 }

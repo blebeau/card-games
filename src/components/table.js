@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Chat from './chat';
-import { Modal } from 'react-bootstrap'
+import { Modal, ModalBody, ModalFooter } from 'react-bootstrap'
 
 // Shuffle algorithim (Fisher-Yates, or Knuth, shuffle)
 function shuffle(array) {
@@ -124,15 +124,8 @@ const Table = ({ socket, table }) => {
     }, [])
 
     useEffect(() => {
-        if (deal) {
-            setHands(deck.splice(0, 2));
-            setDealerHand(deck.splice(0, 2));
-            setPlayerScore(0);
-            setdealerScore(0);
-            setWinner('');
-            setPlayerStay(false)
-        }
-    }, [deal])
+        setShowWinnerModal(true)
+    }, [winner])
 
     // Updates whenever a card is added to either hand
     // and calcualtes/ compares the scores
@@ -150,24 +143,25 @@ const Table = ({ socket, table }) => {
     }, [dealerHand, hands])
 
 
-    // useEffect(() => {
-    //     if (dealerScore > 21) {
-    //         alert('Busted!');
-    //         setWinner('Dealer');
-    //     }
-    //     if (dealerScore > 21) {
-    //         alert('Busted!');
-    //         setWinner('Player');
-    //     }
-    //     if (dealerScore < playerScore && dealerScore > 16) {
-    //         setWinner('Player')
-    //         alert(`Winner: ${winner}`)
-    //     }
-    //     if (dealerScore >= playerScore && dealerScore > 16) {
-    //         setWinner('Dealer')
-    //         alert(`Winner: ${winner}`)
-    //     }
-    // }, [playerScore, dealerScore])
+    useEffect(() => {
+        if (dealerScore > 21) {
+            console.log('winner 1');
+            setWinner('Player');
+        } else if (playerScore > 21) {
+            console.log('winner 2');
+            setWinner('Dealer');
+        } else if (dealerScore < playerScore && dealerScore > 16 && playerStay) {
+            console.log('winner 3');
+            setWinner('Player')
+        } else if (dealerScore >= playerScore && dealerScore > 16 && playerStay) {
+            console.log('winner 4');
+            setWinner('Dealer');
+        } else if (dealerScore === 21) {
+            console.log('winner 5');
+            setWinner('Dealer');
+        } else
+            setWinner('');
+    }, [playerScore, dealerScore])
 
     const hit = () => {
         if (!playerStay)
@@ -176,14 +170,12 @@ const Table = ({ socket, table }) => {
             setDealerHand([...dealerHand, deck[0]]);
         // removes added card from the deck
         setDeck(deck.filter(x => x !== deck[0]))
-
+        console.log('188');
         socket.emit('updateState', {
             playerHand: [...hands],
             dealerHand: [...dealerHand],
             deck: deck.filter(x => x !== deck[0]),
         });
-        console.log('playerScore', playerScore);
-        console.log('dealerScore', dealerScore);
     }
 
     const stay = () => {
@@ -199,29 +191,29 @@ const Table = ({ socket, table }) => {
 
         //TODO: Add score udates for socket
 
-        setShowWinnerModal(true)
-
-        if (playerTotal > 21) {
-            alert('Busted!');
-            setWinner('Dealer');
-        }
-        if (dealerTotal > 21) {
-            alert('Busted!');
-            setWinner('Player');
-        }
-        if (dealerTotal < playerTotal && dealerTotal > 16) {
-            setWinner('Player')
-        }
-        if (dealerTotal > playerTotal && dealerTotal > 16) {
-            setWinner('Dealer')
-        }
-
-        if (winner !== '')
-            setDeal(true)
+        setHands(deck.splice(0, 2));
+        setDealerHand(deck.splice(0, 2));
+        setPlayerScore(0);
+        setdealerScore(0);
+        setWinner('');
+        setPlayerStay(false)
     }
 
     return (
         <div>
+            {winner !== '' ?
+                <Modal show={showWinnerModal}>
+                    <ModalBody>
+                        <p>The winner is: {winner}</p>
+                    </ModalBody>
+                    <ModalFooter>
+                        <button
+                            onClick={endHand}
+                        >Refresh</button>
+                    </ModalFooter>
+
+                </Modal>
+                : null}
             <div className='dealer'>
                 <h3>Dealer</h3>
                 {
@@ -252,10 +244,6 @@ const Table = ({ socket, table }) => {
                     disabled={!playerStay || dealerScore > 16}
                     onClick={hit}
                 >Hit</button>
-                <button
-                    onClick={endHand}
-                >Stay</button>
-
             </div>
             <div className='player'>
                 <h3>Player</h3>

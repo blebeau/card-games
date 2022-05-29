@@ -21,7 +21,6 @@ io.on('connection', socket => {
 
     socket.on('createTable', (data) => {
         io.to(data.table).emit(data);
-
     });
 
     socket.on('sendMessage', (data) => {

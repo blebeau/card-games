@@ -63,7 +63,6 @@ const getTotal = (cards) => {
             total += 10;
     });
 
-    console.log('total', total)
     return total;
 }
 
@@ -105,7 +104,6 @@ const Table = ({ socket, table }) => {
         setHands(shuffledDeck.splice(0, 2))
         setDealerHand(shuffledDeck.splice(0, 2))
 
-
         setPlayerStay(false)
         setdealerScore(0);
         setPlayerScore(0);
@@ -145,19 +143,14 @@ const Table = ({ socket, table }) => {
 
     useEffect(() => {
         if (dealerScore > 21) {
-            console.log('winner 1');
             setWinner('Player');
         } else if (playerScore > 21) {
-            console.log('winner 2');
             setWinner('Dealer');
         } else if (dealerScore < playerScore && dealerScore > 16 && playerStay) {
-            console.log('winner 3');
             setWinner('Player')
         } else if (dealerScore >= playerScore && dealerScore > 16 && playerStay) {
-            console.log('winner 4');
             setWinner('Dealer');
         } else if (dealerScore === 21) {
-            console.log('winner 5');
             setWinner('Dealer');
         } else
             setWinner('');
@@ -170,7 +163,6 @@ const Table = ({ socket, table }) => {
             setDealerHand([...dealerHand, deck[0]]);
         // removes added card from the deck
         setDeck(deck.filter(x => x !== deck[0]))
-        console.log('188');
         socket.emit('updateState', {
             playerHand: [...hands],
             dealerHand: [...dealerHand],

@@ -12,7 +12,6 @@ const Chat = ({ socket, table }) => {
                 time: new Date(Date.now()).getHours() + ':' + new Date(Date.now()).getMinutes(),
             }
             await socket.emit('sendMessage', socketMessage)
-
         }
     }
 

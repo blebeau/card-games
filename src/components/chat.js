@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 const Chat = ({ socket, table }) => {
+    console.log('socket', socket);
     const [message, setMessage] = useState('');
     const [fullChat, setfullChat] = useState([]);
 

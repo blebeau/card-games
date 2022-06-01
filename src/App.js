@@ -7,6 +7,7 @@ const socket = io.connect('http://localhost:3001');
 
 function App() {
   const [table, setTable] = useState('');
+  const [userName, setUserName] = useState('');
 
   const [showTable, setShowTable] = useState(false);
 
@@ -14,6 +15,7 @@ function App() {
   const joinTable = () => {
     if (!table !== '') {
       socket.emit('joinTable', table);
+      socket.emit('setPlayer', userName);
       setShowTable(true);
     }
   };
@@ -29,6 +31,11 @@ function App() {
         <button
           onClick={joinTable}
         >Join Table</button>
+        <input
+          onChange={(event) => {
+            setUserName(event.target.value);
+          }}
+          placeholder='Table ID' />
         {showTable ?
           <Table socket={socket} table={table} />
           : null

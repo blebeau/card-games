@@ -67,6 +67,7 @@ const getTotal = (cards) => {
 }
 
 const Table = ({ socket, table }) => {
+    console.log('socket', socket);
     const cards = [
         '2h', '2c', '2s', '2d',
         '3h', '3c', '3s', '3d',
@@ -95,8 +96,7 @@ const Table = ({ socket, table }) => {
 
     // Runs once to initiate the game
     useEffect(() => {
-        socket.emit('joinedgame', () => {
-        });
+        socket.emit('setPlayer');
         // Randomize the deck
         const shuffledDeck = shuffle(cards);
 
@@ -107,6 +107,7 @@ const Table = ({ socket, table }) => {
         setPlayerStay(false)
         setdealerScore(0);
         setPlayerScore(0);
+        setDeck(shuffledDeck);
 
         socket.emit('createTable', {
             winner: false,
@@ -114,11 +115,9 @@ const Table = ({ socket, table }) => {
             playerScore: 0,
             dealerScore: 0,
             dealerHand: [dealerHand],
-            deck: shuffledDeck,
+            deck: deck,
             table: table,
         });
-
-        setDeck(shuffledDeck);
     }, [])
 
     useEffect(() => {

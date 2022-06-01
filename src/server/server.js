@@ -20,7 +20,8 @@ io.on('connection', socket => {
     });
 
     socket.on('createTable', (data) => {
-        io.to(data.table).emit(data);
+        console.log('create table date', data);
+        socket.to(data.table).emit(data);
     });
 
     socket.on('sendMessage', (data) => {
@@ -29,11 +30,12 @@ io.on('connection', socket => {
 
     // Users joins the table created
     socket.on('joinTable', (data) => {
+        console.log('join table date', data);
         socket.join(data);
     });
 
     // Identifies player 1 as the dealer and player 2 as the player
-    socket.on('setPlayer', () => {
+    socket.on('setPlayer', (data) => {
         if (players === 0) {
             players++;
             socket.emit('Dealer')

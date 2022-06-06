@@ -84,7 +84,7 @@ const Table = ({ socket, table }) => {
         'aceh', 'acec', 'aces', 'aced',
     ]
 
-    const [hands, setHands] = useState([]);
+    const [playerHand, setHands] = useState([]);
     const [playerScore, setPlayerScore] = useState(0);
     const [dealerScore, setdealerScore] = useState(0);
     const [dealerHand, setDealerHand] = useState([]);
@@ -93,6 +93,7 @@ const Table = ({ socket, table }) => {
     const [winner, setWinner] = useState('');
     const [deal, setDeal] = useState(false);
     const [showWinnerModal, setShowWinnerModal] = useState(false);
+    const [gameState, setGameState] = useState([]);
 
     // Runs once to initiate the game
     useEffect(() => {
@@ -100,7 +101,7 @@ const Table = ({ socket, table }) => {
         // Randomize the deck
         const shuffledDeck = shuffle(cards);
 
-        // Set hands, dealing to player first
+        // Set playerHand, dealing to player first
         setHands(shuffledDeck.splice(0, 2))
         setDealerHand(shuffledDeck.splice(0, 2))
 
@@ -109,16 +110,29 @@ const Table = ({ socket, table }) => {
         setPlayerScore(0);
         setDeck(shuffledDeck);
 
-        socket.emit('createTable', {
+        console.log('playerHand', playerHand);
+        console.log('dealerHand', dealerHand);
+        console.log('deck', deck);
+    }, [])
+
+    useEffect(() => {
+        console.log('test')
+        socket.emit('updateTable', {
             winner: false,
-            playerHand: [hands],
+            playerHand: [playerHand],
             playerScore: 0,
             dealerScore: 0,
             dealerHand: [dealerHand],
             deck: deck,
             table: table,
         });
-    }, [])
+    }, [deck])
+
+    useEffect(() => {
+        socket.on('getMessages', (data) => {
+            setGameState((messages) => [...messages, data]);
+        })
+    }, [socket])
 
     useEffect(() => {
         setShowWinnerModal(true)
@@ -131,13 +145,13 @@ const Table = ({ socket, table }) => {
         setPlayerScore(0);
 
         const dealerTotal = getTotal(dealerHand);
-        const playerTotal = getTotal(hands);
+        const playerTotal = getTotal(playerHand);
 
         setdealerScore(dealerTotal);
         setPlayerScore(playerTotal)
 
         //TODO: Add score udates for socket
-    }, [dealerHand, hands])
+    }, [dealerHand, playerHand])
 
 
     useEffect(() => {
@@ -157,13 +171,13 @@ const Table = ({ socket, table }) => {
 
     const hit = () => {
         if (!playerStay)
-            setHands([...hands, deck[0]]);
+            setHands([...playerHand, deck[0]]);
         else
             setDealerHand([...dealerHand, deck[0]]);
         // removes added card from the deck
         setDeck(deck.filter(x => x !== deck[0]))
         socket.emit('updateState', {
-            playerHand: [...hands],
+            playerHand: [...playerHand],
             dealerHand: [...dealerHand],
             deck: deck.filter(x => x !== deck[0]),
         });
@@ -175,7 +189,7 @@ const Table = ({ socket, table }) => {
 
     const endHand = () => {
         const dealerTotal = getTotal(dealerHand);
-        const playerTotal = getTotal(hands);
+        const playerTotal = getTotal(playerHand);
 
         setdealerScore(dealerTotal);
         setPlayerScore(playerTotal)
@@ -239,7 +253,7 @@ const Table = ({ socket, table }) => {
             <div className='player'>
                 <h3>Player</h3>
                 {
-                    hands.map(
+                    playerHand.map(
                         (image) =>
                             <img className="card"
                                 src={require(`../utils/PNG-cards-1.3/${image}.png`)}

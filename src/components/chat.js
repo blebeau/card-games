@@ -18,6 +18,7 @@ const Chat = ({ socket, table }) => {
 
     useEffect(() => {
         socket.on('getMessages', (data) => {
+            console.log('data', data);
             setfullChat((messages) => [...messages, data]);
         })
     }, [socket])

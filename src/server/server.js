@@ -19,12 +19,13 @@ io.on('connection', socket => {
         console.log(`User ${socket.id} disconnected`);
     });
 
-    socket.on('createTable', (data) => {
-        console.log('create table date', data);
-        socket.to(data.table).emit(data);
+    socket.on('updateTable', (data) => {
+        console.log('create table data', data);
+        socket.to(data.table).emit('getTableUpdate', data);
     });
 
     socket.on('sendMessage', (data) => {
+        console.log('sendMessage data', data);
         socket.to(data.table).emit('getMessages', data);
     });
 
